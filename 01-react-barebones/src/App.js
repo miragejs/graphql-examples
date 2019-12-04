@@ -1,24 +1,30 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { useQuery } from "urql";
+
+const getMovies = `
+  query {
+    movies {
+      id
+      title
+    }
+  }
+`;
 
 function App() {
+  const [res] = useQuery({
+    query: getMovies
+  });
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h1>Movies app</h1>
+      {res.fetching ? (
+        <p>Loading...</p>
+      ) : res.error ? (
+        <p style={{ color: "red" }}>{res.error.message}</p>
+      ) : (
+        res.data.movies.map(movie => <p key={movie.id}>{movie.title}</p>)
+      )}
     </div>
   );
 }
